@@ -4,10 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#20392d">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'">
 <title>Panel Isla</title>
-<link rel="icon" type="image/png" href="https://hub-team.xyz/logo-favicon.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230d1424'/%3E%3Cpath d='M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6zM9 12l2 2 4-4' fill='none' stroke='%235eead4' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
-:root{--bg:#070b14;--surf:#0d1424;--surf2:#111a2e;--p:#5eead4;--pl:#818cf8;--text:#e8eefc;--mute:#a3afc8;--dim:#8794b0;--ok:#22c55e;--warn:#eab308;--bad:#ef4444;--line:rgba(129,140,248,.2);--line2:rgba(129,140,248,.1);--sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;--orb:var(--sans);--lado:240px;--tr:background .15s,border-color .15s,color .15s,opacity .15s}
+:root{--bg:#070b14;--surf:#0d1424;--surf2:#111a2e;--p:#5eead4;--pl:#818cf8;--text:#e8eefc;--mute:#a3afc8;--dim:#8794b0;--ok:#22c55e;--warn:#eab308;--bad:#ef4444;--line:rgba(129,140,248,.2);--line2:rgba(129,140,248,.1);--sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;--lado:240px;--tr:background .15s,border-color .15s,color .15s,opacity .15s}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--text);font:400 15px/1.55 var(--sans);min-height:100vh;overflow-x:hidden}
@@ -20,15 +21,15 @@ button,input,select,textarea{font:inherit;color:inherit}
 ::-webkit-scrollbar-thumb{background:rgba(129,140,248,.3);border-radius:8px;border:2px solid var(--bg)}
 .ic{display:inline-block;flex:none;width:1.2em;height:1.2em;line-height:0;vertical-align:-.2em}
 .ic svg{display:block;width:100%;height:100%}
-.ambient-glow{display:none}
 .glass{background:var(--surf);border:1px solid var(--line)}
 .card{border-radius:10px;padding:1.25rem}
 .card h3{font:600 .95rem var(--sans);color:#fff;margin-bottom:.8rem}
+.jid.mt{margin-top:.8rem}
 
 .side{position:fixed;inset:0 auto 0 0;width:var(--lado);padding:1.3rem .9rem;display:flex;flex-direction:column;overflow-y:auto;z-index:60;background:var(--surf);border-right:1px solid var(--line);transition:transform .25s ease}
 .marca-card{display:flex;align-items:center;gap:.75rem;padding:0 .4rem 1.2rem;margin-bottom:1.2rem;border-bottom:1px solid var(--line2)}
 .av{width:36px;height:36px;flex:none;border-radius:8px;overflow:hidden;display:grid;place-items:center;background:var(--surf2);border:1px solid var(--line)}
-.av img{width:100%;height:100%;object-fit:cover}
+.av svg{width:70%;height:70%;color:var(--p)}
 .marca-card small{display:block;font-size:.72rem;color:var(--dim);line-height:1.2}
 .marca-card strong{font:600 1rem var(--sans);color:#fff}
 .sec-t{padding:0 .6rem;margin-bottom:.5rem;font-size:.72rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
@@ -45,7 +46,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .topbar{display:none;position:fixed;inset:0 0 auto 0;z-index:50;align-items:center;padding:.7rem 1rem;background:var(--surf);border-width:0 0 1px}
 .topbar-left{display:flex;align-items:center;gap:.8rem}
 .burger{background:none;border:0;color:var(--mute);font-size:1.8rem;line-height:1;cursor:pointer;display:grid;place-items:center}
-.topbar img{height:30px;width:30px;border-radius:7px;object-fit:cover}
+.topbar .logo{display:grid;place-items:center;width:30px;height:30px;border-radius:7px;background:var(--surf2);border:1px solid var(--line);color:var(--p)}
+.topbar .logo svg{width:70%;height:70%}
 .topbar .t{font:600 1rem var(--sans);color:#fff}
 @media (max-width:1100px){.side{transform:translateX(-105%)}.side.abierto{transform:none}.topbar{display:flex}main{margin-left:0!important;padding-top:4.8rem!important}}
 
@@ -234,7 +236,7 @@ body{background:var(--bg);color:var(--text);font-size:14px;letter-spacing:.005em
 .topbar{background:#20392d;border:0;box-shadow:0 2px 12px rgba(20,38,27,.12);padding:.72rem 1rem}
 .burger{color:#e5eee7;font-size:1.55rem}
 .topbar .t{color:#f6faf6;font-size:.96rem}
-.topbar img{border-radius:9px}
+
 
 /* Contenido y encabezados */
 main{padding:2.6rem clamp(1.15rem,4vw,3.2rem) 4rem}
@@ -408,7 +410,7 @@ button{touch-action:manipulation}
   <header class="topbar glass">
     <div class="topbar-left">
       <button class="burger" id="burger" type="button" aria-label="Abrir menú"><span data-i="menu"></span></button>
-      <img src="https://hub-team.xyz/logo-favicon.png" alt="" onerror="this.remove()">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
       <span class="t">Panel Isla</span>
     </div>
   </header>
@@ -416,7 +418,7 @@ button{touch-action:manipulation}
 
   <nav class="side" id="lado" aria-label="Secciones">
     <div class="marca-card">
-      <span class="av"><img src="https://hub-team.xyz/logo-favicon.png" alt="" onerror="this.remove()"></span>
+      <span class="av" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
       <span><small id="rolPanel">Panel del bot</small><strong>Panel Isla</strong></span>
     </div>
     <div class="sec-t">Secciones</div>
@@ -759,7 +761,7 @@ function filaSubBot(b) {
   const extra = [];
   if (b.cola != null) extra.push('cola ' + miles(b.cola));
   if (b.tope) extra.push('hoy ' + miles(b.hoy) + '/' + miles(b.tope));
-  if (b.deltaMb) extra.push('+' + b.deltaMb + ' MB');
+  if (b.deltaMb) extra.push('+' + mb(b.deltaMb));
   if (b.estado === 'esperando-vinculo' && b.venceS != null) extra.push('vence en ' + Math.ceil(b.venceS / 60) + ' min');
   if (extra.length) lineas.push(h('div', 'sub', extra.join(' · ')));
   const der = [etq(texto, tipo)];
@@ -818,6 +820,18 @@ function pintarSubBots(s, sub) {
 }
 
 let subsCargando = false;
+let resumenCargando = false;
+async function cargarResumen() {
+  if (resumenCargando) return;
+  resumenCargando = true;
+  try {
+    pintarSocket(await api('/api/owner/socket'));
+  } catch (e) {
+    if (e.status === 401) sesionCaducada();
+  } finally {
+    resumenCargando = false;
+  }
+}
 async function cargarSubBots(manual) {
   if (subsCargando) return;
   subsCargando = true;
@@ -1166,9 +1180,8 @@ function tabGeneral(d) {
   const out = [
     datos([['Miembros', miles(d.miembros)], ['Admins', miles(d.admins.length)], ['Con advertencias', miles(d.moderacion.usuariosConAdvertencias)], ['Silenciados', miles(d.moderacion.silenciadosActivos)]]),
     h('div', 'bloque', estado),
-    h('p', 'jid', 'Creado ' + fecha(d.creado) + (d.creador ? ' por ' + d.creador : ''))
+    h('p', 'jid mt', 'Creado ' + fecha(d.creado) + (d.creador ? ' por ' + d.creador : ''))
   ];
-  out[2].style.marginTop = '.8rem';
   out.push(bloque('Nombre del grupo', nombreEditor(d.id, d.nombre)));
   if (esOwner) {
     out.push(bloque('Bot en este grupo', editables(d.id, [['Bot activo', !d.botApagado, 'botActivo', {
@@ -1537,12 +1550,17 @@ async function iniciar() {
 $('formLogin').addEventListener('submit', async (ev) => {
   ev.preventDefault();
   $('errLogin').textContent = '';
+  const b = $('formLogin').querySelector('button[type="submit"]');
+  if (b.disabled) return;
+  b.disabled = true;
   try {
     await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ codigo: $('codigo').value.trim() }) });
     $('codigo').value = '';
     iniciar();
   } catch (e) {
     $('errLogin').textContent = e.status === 400 ? 'Ese código no es válido o ya caducó. Pide uno nuevo con /panel.' : e.message;
+  } finally {
+    b.disabled = false;
   }
 });
 $('btnSalir').addEventListener('click', async () => {
@@ -1569,7 +1587,9 @@ $('orden').addEventListener('change', () => { paginaGrupos = 1; cargarGrupos(fal
 $('btnRefrescar').addEventListener('click', () => cargarGrupos(true));
 $('btnRefrescarSubs').addEventListener('click', () => cargarSubBots(true));
 setInterval(() => {
-  if (esOwner && !document.hidden && !$('vistaApp').hidden && $('v-subbots').classList.contains('activa')) cargarSubBots(false);
+  if (!esOwner || document.hidden || $('vistaApp').hidden) return;
+  if ($('v-subbots').classList.contains('activa')) cargarSubBots(false);
+  else if ($('v-resumen').classList.contains('activa')) cargarResumen();
 }, 15000);
 
 iniciar();
