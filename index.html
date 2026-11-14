@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#20392d">
+<title>Panel Isla</title>
+<link rel="icon" type="image/png" href="https://hub-team.xyz/logo-favicon.png">
+<style>
+:root{--bg:#070b14;--surf:#0d1424;--surf2:#111a2e;--p:#5eead4;--pl:#818cf8;--text:#e8eefc;--mute:#a3afc8;--dim:#8794b0;--ok:#22c55e;--warn:#eab308;--bad:#ef4444;--line:rgba(129,140,248,.2);--line2:rgba(129,140,248,.1);--sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;--orb:var(--sans);--lado:240px;--tr:background .15s,border-color .15s,color .15s,opacity .15s}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font:400 15px/1.55 var(--sans);min-height:100vh;overflow-x:hidden}
+body.bloqueo{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--pl);outline-offset:2px;border-radius:6px}
+[hidden]{display:none!important}
+::-webkit-scrollbar{width:8px;background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(129,140,248,.3);border-radius:8px;border:2px solid var(--bg)}
+.ic{display:inline-block;flex:none;width:1.2em;height:1.2em;line-height:0;vertical-align:-.2em}
+.ic svg{display:block;width:100%;height:100%}
+.ambient-glow{display:none}
+.glass{background:var(--surf);border:1px solid var(--line)}
+.card{border-radius:10px;padding:1.25rem}
+.card h3{font:600 .95rem var(--sans);color:#fff;margin-bottom:.8rem}
+
+.side{position:fixed;inset:0 auto 0 0;width:var(--lado);padding:1.3rem .9rem;display:flex;flex-direction:column;overflow-y:auto;z-index:60;background:var(--surf);border-right:1px solid var(--line);transition:transform .25s ease}
+.marca-card{display:flex;align-items:center;gap:.75rem;padding:0 .4rem 1.2rem;margin-bottom:1.2rem;border-bottom:1px solid var(--line2)}
+.av{width:36px;height:36px;flex:none;border-radius:8px;overflow:hidden;display:grid;place-items:center;background:var(--surf2);border:1px solid var(--line)}
+.av img{width:100%;height:100%;object-fit:cover}
+.marca-card small{display:block;font-size:.72rem;color:var(--dim);line-height:1.2}
+.marca-card strong{font:600 1rem var(--sans);color:#fff}
+.sec-t{padding:0 .6rem;margin-bottom:.5rem;font-size:.72rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+.menu{list-style:none;display:flex;flex-direction:column;gap:2px}
+.menu a{display:flex;align-items:center;gap:.7rem;padding:.55rem .7rem;border-radius:8px;color:var(--mute);font-size:.9rem;transition:var(--tr)}
+.menu a:hover{background:var(--surf2);color:#fff}
+.menu a.activo{background:var(--surf2);color:#fff;font-weight:600;box-shadow:inset 2px 0 0 var(--pl)}
+.menu a.activo .ic{color:var(--pl)}
+.pie{margin-top:auto;padding-top:1rem;border-top:1px solid var(--line2);display:grid;gap:.6rem;font-size:.76rem;color:var(--dim)}
+.salir{display:flex;align-items:center;gap:.6rem;width:100%;padding:.55rem .7rem;border-radius:8px;border:1px solid var(--line);background:none;color:var(--mute);font-size:.85rem;cursor:pointer;transition:var(--tr)}
+.salir:hover{color:#fff;background:var(--surf2)}
+.overlay{position:fixed;inset:0;display:none;z-index:55;background:rgba(4,7,14,.7)}
+.overlay.abierto{display:block}
+.topbar{display:none;position:fixed;inset:0 0 auto 0;z-index:50;align-items:center;padding:.7rem 1rem;background:var(--surf);border-width:0 0 1px}
+.topbar-left{display:flex;align-items:center;gap:.8rem}
+.burger{background:none;border:0;color:var(--mute);font-size:1.8rem;line-height:1;cursor:pointer;display:grid;place-items:center}
+.topbar img{height:30px;width:30px;border-radius:7px;object-fit:cover}
+.topbar .t{font:600 1rem var(--sans);color:#fff}
+@media (max-width:1100px){.side{transform:translateX(-105%)}.side.abierto{transform:none}.topbar{display:flex}main{margin-left:0!important;padding-top:4.8rem!important}}
+
+main{margin-left:var(--lado);padding:2.5rem clamp(1.1rem,4vw,2.8rem) 4rem;min-height:100vh}
+.vista{display:none;max-width:980px;margin:auto}
+.vista.activa{display:block}
+.cab{margin-bottom:1.5rem}
+.cab h2{font:600 clamp(1.4rem,3.6vw,1.9rem)/1.2 var(--sans);color:#fff}
+.cab h2 span{color:var(--p)}
+.cap{margin-top:.3rem;color:var(--dim);font-size:.85rem}
+
+.franja{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-radius:10px;margin-bottom:1.1rem}
+.fr{display:flex;align-items:center;gap:.8rem;padding:1rem 1.1rem;border-left:1px solid var(--line);min-width:0}
+.fr:first-child{border-left:0}
+.fr>.ic{font-size:1.4rem;color:var(--pl)}
+.fr .et{display:block;font-size:.74rem;color:var(--dim)}
+.fr .val{display:block;font:600 1.05rem var(--sans);color:#fff}
+.fr .val.ok{color:var(--ok)}.fr .val.mal{color:var(--bad)}
+@media (max-width:760px){.franja{grid-template-columns:repeat(2,1fr)}.fr:nth-child(3){border-left:0}.fr:nth-child(n+3){border-top:1px solid var(--line)}}
+.dos{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.1rem}
+dl.datos div{display:flex;justify-content:space-between;gap:1rem;padding:.55rem 0;border-bottom:1px solid var(--line2);font-size:.88rem}
+dl.datos div:last-child{border:0}
+dl.datos dt{color:var(--dim)}
+dl.datos dd{font-weight:600;color:#fff;text-align:right;overflow-wrap:anywhere}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:.5rem}
+.tile{padding:.6rem .8rem;border-radius:8px;background:var(--bg);border:1px solid var(--line2);font-size:.74rem;color:var(--dim)}
+.tile b{display:block;font:600 1.2rem var(--sans);color:#fff}
+
+.herr{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem}
+.buscar,select{padding:.6rem .9rem;border-radius:8px;border:1px solid var(--line);background:var(--bg);font-size:.9rem;transition:var(--tr)}
+.buscar:focus,select:focus,.num:focus,.hora-in:focus,.txt:focus,.nom-in:focus{border-color:var(--pl);outline:0}
+.buscar{flex:1 1 220px;min-width:0}
+select{cursor:pointer}
+select option{background:#0f1626}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.6rem 1.1rem;border-radius:8px;border:1px solid var(--line);background:var(--surf2);color:#fff;font:600 .85rem var(--sans);cursor:pointer;transition:var(--tr)}
+.btn:hover{border-color:rgba(129,140,248,.5);background:#16213a}
+.btn.p{background:var(--p);border-color:var(--p);color:#06201c}
+.btn.p:hover{background:#7ff0de}
+.btn.peligro{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.peligro:hover{background:#f05656}
+.btn.s{padding:.35rem .65rem;font-size:.78rem;border-radius:7px;gap:.35rem}
+.btn.i{padding:0;width:2rem;height:2rem}
+.btn:disabled{opacity:.5;cursor:default}
+.lista{display:grid;gap:.5rem}
+.sep{margin-top:1.1rem}
+.fila.fija{cursor:default}
+.fila.fija:hover{background:var(--surf);border-color:var(--line)}
+.fila .sub+.sub{margin-top:.1rem}
+.fila{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.9rem;width:100%;padding:.8rem 1rem;text-align:left;border-radius:10px;cursor:pointer;transition:var(--tr)}
+.fila:hover{background:var(--surf2);border-color:rgba(129,140,248,.45)}
+.fila.sel{border-color:var(--pl)}
+.ini{width:38px;height:38px;border-radius:8px;display:grid;place-items:center;font:600 .95rem var(--sans);color:var(--p);background:var(--bg);border:1px solid var(--line)}
+.fila .nombre,.miembro .nombre{font:600 .95rem var(--sans);color:#fff;overflow-wrap:anywhere}
+.fila .sub{font-size:.78rem;color:var(--dim)}
+.fila .der{display:flex;align-items:center;gap:.6rem;color:var(--dim);font-size:.8rem;white-space:nowrap}
+.fila .der .ic{font-size:1.15rem;color:var(--dim)}
+.punto{width:.5rem;height:.5rem;border-radius:50%;background:var(--ok)}
+.punto.aviso{background:var(--warn)}.punto.mal{background:var(--bad)}
+@media (max-width:560px){.fila{grid-template-columns:auto 1fr}.fila .der{grid-column:1/-1}}
+.etq{display:inline-block;padding:.08rem .55rem;border-radius:6px;border:1px solid var(--line);color:var(--mute);font-size:.72rem;font-weight:600}
+.etq.ok{border-color:rgba(34,197,94,.4);color:var(--ok)}.etq.mal{border-color:rgba(239,68,68,.4);color:var(--bad)}.etq.aviso{border-color:rgba(234,179,8,.4);color:var(--warn)}.etq.rosa{border-color:rgba(129,140,248,.5);color:var(--pl)}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem}
+.msg{padding:2.2rem 0;text-align:center;color:var(--mute)}
+.msg.err{color:#ff8a9b}
+.vacio{padding:1.5rem;text-align:center;border-radius:10px}
+.vacio h3{font:600 1rem var(--sans);color:#fff;margin-bottom:.4rem}
+.vacio p{color:var(--mute);font-size:.9rem}
+.pager{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.8rem;margin-top:1rem;font-size:.8rem;color:var(--dim)}
+.pager:empty{display:none}
+
+.velo{position:fixed;inset:0;z-index:70;background:rgba(2,5,12,.6);opacity:0;pointer-events:none;transition:opacity .2s}
+.velo.on{opacity:1;pointer-events:auto}
+.panel{position:fixed;top:0;right:0;bottom:0;z-index:80;width:min(500px,100%);display:flex;flex-direction:column;background:var(--surf);border-left:1px solid var(--line);transform:translateX(100%);visibility:hidden;transition:transform .25s ease,visibility 0s .25s}
+.panel.on{transform:none;visibility:visible;transition:transform .25s ease}
+.panel-cab{display:flex;gap:1rem;align-items:flex-start;padding:1.1rem 1.25rem;border-bottom:1px solid var(--line)}
+.panel-cab div{flex:1;min-width:0}
+.panel-cab h3{font:600 1.15rem/1.3 var(--sans);color:#fff;overflow-wrap:anywhere}
+.jid{font-size:.75rem;color:var(--dim);overflow-wrap:anywhere}
+.cerrar{flex:none;width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:none;display:grid;place-items:center;font-size:1.3rem;color:var(--mute);cursor:pointer}
+.cerrar:hover{color:#fff;background:var(--surf2)}
+.tabs{display:flex;gap:.2rem;padding:0 1rem;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs:empty{display:none}
+.tab{flex:none;padding:.7rem .8rem;border:0;border-bottom:2px solid transparent;background:none;color:var(--mute);font:500 .85rem var(--sans);cursor:pointer;transition:var(--tr)}
+.tab:hover{color:#fff}
+.tab.on{color:#fff;border-bottom-color:var(--pl)}
+.panel-cuerpo{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 2.4rem;overscroll-behavior:contain}
+.panel-cuerpo p{font-size:.9rem;color:var(--mute)}
+.panel-cuerpo p.jid{font-size:.76rem;color:var(--dim)}
+.bloque{margin-top:1.4rem}
+.bloque:first-child{margin-top:0}
+.bloque h4{font:600 .78rem var(--sans);color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
+.bloque>.jid{margin-bottom:.6rem}
+.caja{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg)}
+.caja.apagada{opacity:.55}
+.int{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.6rem .9rem;font-size:.88rem}
+.int+.int{border-top:1px solid var(--line2)}
+.int span:last-child{display:inline-flex;align-items:center;gap:.45rem;font-weight:600;font-size:.78rem;color:var(--dim);text-align:right}
+.int span:last-child::before{content:"";width:.45rem;height:.45rem;flex:none;border-radius:50%;background:currentColor}
+.int.on span:last-child{color:var(--ok)}
+.int.dato span:last-child{color:#fff}.int.dato span:last-child::before{display:none}
+.sw{flex:none;width:40px;height:22px;padding:0;position:relative;border-radius:999px;border:1px solid var(--line);background:var(--surf2);cursor:pointer;transition:var(--tr)}
+.sw i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--dim);transition:left .15s,background .15s}
+.sw.on{background:rgba(34,197,94,.2);border-color:rgba(34,197,94,.6)}
+.sw.on i{left:20px;background:var(--ok)}
+.sw:disabled{opacity:.55;cursor:wait}
+.toast{position:fixed;left:50%;bottom:1.3rem;z-index:120;max-width:min(92vw,420px);padding:.65rem 1rem;border-radius:8px;border:1px solid var(--line);background:var(--surf2);color:#fff;font-size:.86rem;text-align:center;opacity:0;pointer-events:none;transform:translate(-50%,8px);transition:opacity .2s,transform .2s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast.err{border-color:rgba(239,68,68,.6);color:#ff8a9b}
+.ctl{display:flex;align-items:center;gap:.6rem}
+.num,.hora-in{width:5.6rem;padding:.3rem .55rem;border-radius:7px;border:1px solid var(--line);background:var(--surf);font-size:.88rem;color:#fff;text-align:center;color-scheme:dark}
+.hora-in{width:6.6rem}
+.int select{padding:.3rem .6rem;font-size:.82rem;border-radius:7px}
+.txt{display:block;width:100%;resize:vertical;padding:.65rem .85rem;margin-bottom:.7rem;border-radius:8px;border:1px solid var(--line);background:var(--bg);font-size:.88rem;color:#fff}
+.num:disabled,.hora-in:disabled,.int select:disabled,.txt:disabled,.btn:disabled,.nom-in:disabled{opacity:.55;cursor:wait}
+.reglas{white-space:pre-wrap;padding:.8rem 1rem;border-radius:8px;background:var(--bg);color:var(--mute);font-size:.86rem}
+.nom-fila{display:flex;gap:.6rem;flex-wrap:wrap}
+.nom-in{flex:1 1 200px;min-width:0;padding:.55rem .85rem;border-radius:8px;border:1px solid var(--line);background:var(--bg);font-size:.9rem;color:#fff}
+.acciones-fila{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:space-between}
+.contador{font-size:.72rem;color:var(--dim)}
+
+.miembro{display:grid;grid-template-columns:auto 1fr auto;gap:.8rem;align-items:center;padding:.7rem .85rem;border-radius:8px;border:1px solid var(--line);background:var(--bg)}
+.miembro .chips{margin-top:.25rem}
+.acc{display:flex;gap:.35rem;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:560px){.miembro{grid-template-columns:auto 1fr}.acc{grid-column:1/-1;justify-content:flex-start}}
+.reg{display:grid;gap:.5rem;padding:.75rem .9rem;border-radius:8px;border:1px solid var(--line);background:var(--bg)}
+.reg+.reg{margin-top:.5rem}
+.reg .top{display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap}
+.reg .nombre{font:600 .92rem var(--sans);color:#fff;overflow-wrap:anywhere}
+.reg small{display:block;color:var(--dim);font-size:.76rem;overflow-wrap:anywhere}
+.form-fila{display:flex;gap:.6rem;flex-wrap:wrap}
+
+.modal-velo{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:1rem;background:rgba(2,5,12,.7)}
+.modal{width:min(420px,100%);padding:1.3rem;border-radius:12px;background:var(--surf)}
+.modal h3{font:600 1.05rem var(--sans);color:#fff;overflow-wrap:anywhere}
+.modal p{margin-top:.5rem;color:var(--mute);font-size:.9rem}
+.campo{display:block;margin-top:.9rem;font-size:.82rem;font-weight:600;color:var(--mute)}
+.campo input,.campo select{display:block;width:100%;margin-top:.3rem;padding:.55rem .85rem;border-radius:8px;border:1px solid var(--line);background:var(--bg);font-size:.9rem;color:#fff}
+.modal-botones{display:flex;justify-content:flex-end;gap:.6rem;margin-top:1.2rem;flex-wrap:wrap}
+
+.entrada{max-width:380px;margin:14vh auto 0;padding:0 20px;text-align:left}
+.entrada .card{padding:1.6rem}
+.entrada .ico{width:40px;height:40px;margin:0 0 1rem;border-radius:8px;display:grid;place-items:center;background:var(--bg);border:1px solid var(--line);font-size:1.3rem;color:var(--pl)}
+.entrada h3{font-size:1.2rem;margin-bottom:0}
+.entrada p{color:var(--mute);font-size:.9rem;margin:.4rem 0 1.2rem}
+.entrada input{width:100%;text-align:center;letter-spacing:.25em;font-size:1.1rem;padding:.7rem;border-radius:8px;border:1px solid var(--line);background:var(--bg);margin-bottom:.8rem}
+.entrada input:focus{border-color:var(--pl);outline:0}
+.entrada .err{color:#ff8a9b;font-size:.86rem;min-height:1.3rem;margin-bottom:.6rem}
+.entrada .btn{width:100%}
+
+/* ── Isla Control · renovación visual ─────────────────────────────── */
+:root{
+  --bg:#f3f5f1;--surf:#ffffff;--surf2:#edf2ed;
+  --p:#a8c7b5;--pl:#39765d;--text:#202a24;--mute:#53645a;--dim:#78877d;
+  --ok:#287b51;--warn:#a66a16;--bad:#b74747;
+  --line:#dfe6df;--line2:#edf1ed;
+  --sans:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  --lado:248px;--tr:background .18s ease,border-color .18s ease,color .18s ease,opacity .18s ease,box-shadow .18s ease;
+}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--text);font-size:14px;letter-spacing:.005em}
+::selection{background:#c8dfd0;color:#183c2b}
+:focus-visible{outline:2px solid #579574;outline-offset:3px}
+::-webkit-scrollbar{width:7px;background:transparent}
+::-webkit-scrollbar-thumb{background:#cbd5cc;border:2px solid transparent;background-clip:padding-box;border-radius:8px}
+.glass{background:var(--surf);border:1px solid var(--line);box-shadow:0 1px 2px rgba(28,45,34,.035)}
+.card{border-radius:13px;padding:1.35rem}
+.card h3{color:#26352b;font-size:.94rem;font-weight:650;letter-spacing:-.015em;margin-bottom:1rem}
+
+/* Navegación */
+.side{background:#20392d;color:#eaf1eb;border:0;padding:1.45rem 1rem;box-shadow:3px 0 18px rgba(28,48,36,.06)}
+.marca-card{border-bottom:1px solid rgba(231,242,233,.13);padding:0 .35rem 1.35rem;margin-bottom:1.45rem}
+.av{width:39px;height:39px;border-radius:11px;background:#2b4939;border:1px solid rgba(255,255,255,.12)}
+.marca-card small{color:#a9bdb0;font-size:.7rem;letter-spacing:.04em}
+.marca-card strong{color:#f6faf6;font-size:1.02rem;letter-spacing:-.025em}
+.sec-t{color:#91a99a;font-size:.66rem;letter-spacing:.13em;padding:0 .65rem;margin-bottom:.65rem}
+.menu{gap:5px}
+.menu a{color:#b9c9bd;padding:.72rem .8rem;border-radius:9px;font-size:.87rem}
+.menu a:hover{background:rgba(255,255,255,.07);color:#fff}
+.menu a.activo{background:#315441;color:#fff;box-shadow:inset 3px 0 #b5d5c1;font-weight:600}
+.menu a.activo .ic{color:#c6e1ce}
+.pie{border-color:rgba(231,242,233,.13);color:#91a99a}
+.salir{border-color:rgba(231,242,233,.18);color:#c5d3c9;border-radius:9px;padding:.65rem .75rem}
+.salir:hover{background:rgba(255,255,255,.08);color:#fff}
+.overlay{background:rgba(15,28,20,.48)}
+.topbar{background:#20392d;border:0;box-shadow:0 2px 12px rgba(20,38,27,.12);padding:.72rem 1rem}
+.burger{color:#e5eee7;font-size:1.55rem}
+.topbar .t{color:#f6faf6;font-size:.96rem}
+.topbar img{border-radius:9px}
+
+/* Contenido y encabezados */
+main{padding:2.6rem clamp(1.15rem,4vw,3.2rem) 4rem}
+.vista{max-width:1040px}
+.cab{margin-bottom:1.65rem}
+.cab h2{font-size:clamp(1.55rem,3.4vw,2.05rem);font-weight:680;letter-spacing:-.055em;color:#243229}
+.cab h2 span{color:#39765d}
+.cap{color:#78877d;font-size:.87rem;margin-top:.45rem}
+
+/* Resumen */
+.franja{background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:0 1px 2px rgba(28,45,34,.035);overflow:hidden}
+.fr{padding:1.15rem 1.2rem;border-color:var(--line2);gap:.9rem}
+.fr>.ic{font-size:1.25rem;color:#56836a;background:#edf4ee;border-radius:10px;padding:.55rem;width:2.35rem;height:2.35rem;display:grid;place-items:center;vertical-align:middle}
+.fr .et{color:#7b897f;font-size:.7rem;margin-bottom:.12rem}
+.fr .val{color:#26352b;font-size:1.12rem;font-weight:680;letter-spacing:-.025em}
+.dos{gap:1rem}
+dl.datos div{border-color:var(--line2);padding:.65rem 0;font-size:.85rem}
+dl.datos dt{color:#77867c}
+dl.datos dd{color:#29382e;font-weight:620}
+.tile{background:#f5f7f4;border:1px solid #e7ece6;border-radius:9px;color:#6d7d72;padding:.72rem .8rem}
+.tile b{color:#2d4937;font-size:1.16rem}
+
+/* Búsqueda, filtros y botones */
+.herr{gap:.55rem;margin-bottom:1.1rem}
+.buscar,select{background:#fff;border:1px solid #dce4dc;color:#28372d;border-radius:9px;padding:.68rem .85rem;font-size:.86rem;box-shadow:0 1px 1px rgba(25,45,31,.02)}
+.buscar::placeholder{color:#98a49b}
+.buscar:focus,select:focus,.num:focus,.hora-in:focus,.txt:focus,.nom-in:focus{border-color:#6e9c7d;box-shadow:0 0 0 3px rgba(83,139,101,.11);outline:0}
+select option{background:#fff;color:#26352b}
+.btn{background:#fff;border:1px solid #dce4dc;color:#34463a;border-radius:9px;padding:.65rem .95rem;font-size:.83rem;font-weight:620}
+.btn:hover{background:#f4f7f3;border-color:#b9cbbd;color:#244b35}
+.btn.p{background:#315f46;border-color:#315f46;color:#fff}
+.btn.p:hover{background:#264e38;border-color:#264e38}
+.btn.peligro{background:#b74747;border-color:#b74747;color:#fff}
+.btn.peligro:hover{background:#9f3838}
+.btn.s{padding:.38rem .65rem;font-size:.76rem}
+.btn:disabled{opacity:.48}
+
+/* Lista de grupos */
+.lista{gap:.55rem}
+.fila{background:#fff;border:1px solid #e1e8e1;border-radius:11px;padding:.85rem 1rem;gap:1rem;box-shadow:0 1px 2px rgba(28,45,34,.025)}
+.fila:hover{background:#fbfdfb;border-color:#b9cdbd;box-shadow:0 3px 10px rgba(34,67,43,.055)}
+.fila.sel{border-color:#6c9879;background:#f6faf6;box-shadow:0 0 0 2px rgba(79,133,94,.09)}
+.ini{width:40px;height:40px;border-radius:11px;background:#edf4ee;border:1px solid #e0ebe1;color:#37664a;font-size:.96rem}
+.fila .nombre,.miembro .nombre{color:#29382e;font-weight:650;font-size:.9rem}
+.fila .sub{color:#819087;font-size:.76rem;margin-top:.12rem}
+.fila .der{color:#78877d;font-size:.75rem}
+.fila .der .ic{color:#8a9b8e}
+.punto{width:.48rem;height:.48rem}
+.etq{border-radius:6px;border-color:#e1e8e1;color:#637369;background:#f8faf8;font-size:.68rem;padding:.12rem .48rem}
+.etq.ok{border-color:#cce3d2;color:#287b51;background:#f0f8f2}
+.etq.mal{border-color:#efd1d1;color:#b74747;background:#fff6f5}
+.etq.aviso{border-color:#eadfc8;color:#96651f;background:#fffaf0}
+.etq.rosa{border-color:#d8e4da;color:#416c50;background:#f2f7f2}
+.chips{gap:.4rem}
+.msg{color:#75847a}
+.msg.err{color:#b74747}
+.vacio{background:#fff;border:1px dashed #d8e2d9;border-radius:12px}
+.vacio h3{color:#29382e}.vacio p{color:#77867c}
+.pager{color:#78877d}
+
+/* Panel lateral de grupo */
+.velo{background:rgba(22,37,27,.28);backdrop-filter:blur(2px)}
+.panel{background:#fff;border-left:1px solid #dfe6df;box-shadow:-12px 0 35px rgba(25,43,30,.10);width:min(540px,100%)}
+.panel-cab{padding:1.2rem 1.35rem;border-color:#e7ece7;align-items:center}
+.panel-cab h3{color:#26372c;font-size:1.08rem;font-weight:680;letter-spacing:-.025em}
+.jid{color:#829087;font-size:.72rem}
+.cerrar{width:34px;height:34px;border-radius:9px;border-color:#e0e7e0;color:#6e7e73;font-size:1.15rem}
+.cerrar:hover{background:#f2f6f2;color:#26372c}
+.tabs{padding:0 1.1rem;border-color:#e7ece7;gap:.25rem}
+.tab{padding:.78rem .75rem;color:#7a897f;font-size:.81rem;font-weight:570}
+.tab:hover{color:#315f46}
+.tab.on{color:#315f46;border-bottom-color:#4c805e;font-weight:680}
+.panel-cuerpo{padding:1.25rem 1.35rem 2.5rem}
+.panel-cuerpo p{color:#66766b;font-size:.86rem}
+.panel-cuerpo p.jid{color:#87948a}
+.bloque{margin-top:1.5rem}
+.bloque h4{color:#7a897f;font-size:.69rem;letter-spacing:.12em;margin-bottom:.6rem}
+.caja{background:#fff;border:1px solid #e1e8e1;border-radius:10px}
+.caja.apagada{opacity:.58}
+.int{padding:.72rem .9rem;color:#34443a;font-size:.84rem}
+.int+.int{border-color:#edf1ed}
+.int span:last-child{color:#7c8b81;font-size:.74rem}
+.int.on span:last-child{color:#287b51}
+.int.dato span:last-child{color:#2c4032}
+.sw{width:39px;height:22px;background:#e9eee9;border:1px solid #d8e1d9}
+.sw i{background:#9aa89d}
+.sw.on{background:#dcecdf;border-color:#a7c9ae}
+.sw.on i{background:#397b50}
+.toast{background:#263d2e;border:1px solid #3c5945;color:#f6faf6;border-radius:10px;box-shadow:0 6px 22px rgba(20,38,27,.18)}
+.toast.err{background:#813d3d;border-color:#a75b5b;color:#fff}
+.num,.hora-in{background:#fff;border:1px solid #dce5dc;color:#29382e;border-radius:8px;color-scheme:light}
+.int select{background:#fff;color:#29382e;border-color:#dce5dc}
+.txt{background:#fff;border:1px solid #dce5dc;color:#29382e;border-radius:9px;padding:.75rem .85rem}
+.reglas{background:#f5f7f4;color:#596a5e;border:1px solid #e7ece6;border-radius:9px}
+.nom-in{background:#fff;border:1px solid #dce5dc;color:#29382e;border-radius:9px}
+.miembro{background:#fff;border:1px solid #e1e8e1;border-radius:10px;padding:.8rem}
+.reg{background:#fff;border:1px solid #e1e8e1;border-radius:10px}
+.reg .nombre{color:#29382e}
+.reg small{color:#819087}
+
+/* Acceso y ventanas */
+.modal-velo{background:rgba(22,37,27,.42);backdrop-filter:blur(3px)}
+.modal{background:#fff;border:1px solid #e0e7e0;border-radius:14px;box-shadow:0 18px 55px rgba(20,38,27,.18);padding:1.5rem}
+.modal h3{color:#26372c}.modal p{color:#66766b}
+.campo{color:#596a5e}
+.campo input,.campo select{background:#fff;border:1px solid #dce5dc;color:#29382e;border-radius:9px}
+.entrada{max-width:410px;margin:clamp(5rem,17vh,10rem) auto 0;padding:0 20px}
+.entrada .card{padding:2rem;border-radius:16px;box-shadow:0 12px 38px rgba(34,59,40,.08)}
+.entrada .ico{width:44px;height:44px;border-radius:12px;background:#edf4ee;border:1px solid #e0ebe1;color:#39765d}
+.entrada h3{font-size:1.3rem;letter-spacing:-.035em;color:#26372c}
+.entrada p{color:#738278;line-height:1.65}
+.entrada p b{color:#315f46}
+.entrada input{background:#f9fbf9;border:1px solid #dce5dc;color:#29382e;border-radius:10px;letter-spacing:.18em}
+.entrada input:focus{border-color:#6e9c7d;box-shadow:0 0 0 3px rgba(83,139,101,.11);outline:0}
+.entrada .err{color:#b74747}
+
+/* Ajustes táctiles y móviles */
+button,input,select,textarea{-webkit-tap-highlight-color:transparent}
+button{touch-action:manipulation}
+@media(max-width:1100px){
+  .side{box-shadow:12px 0 35px rgba(16,34,22,.16)}
+  main{padding-top:5.1rem!important}
+}
+@media(max-width:760px){
+  main{padding-left:1rem;padding-right:1rem;padding-bottom:2rem}
+  .cab{margin-bottom:1.2rem}
+  .franja{border-radius:12px}
+  .fr{padding:.9rem .85rem;gap:.65rem}
+  .fr>.ic{width:2.1rem;height:2.1rem;font-size:1.05rem;padding:.48rem}
+  .dos{grid-template-columns:1fr;gap:.75rem}
+  .card{padding:1.05rem}
+  .herr{display:grid;grid-template-columns:1fr auto}
+  .herr .buscar{grid-column:1/-1;width:100%}
+  .herr select{min-width:0}
+  .herr .btn{white-space:nowrap}
+  .panel{top:0;left:0;right:0;bottom:0;width:100%;border:0;border-radius:0}
+  .panel-cab{padding:1rem}
+  .panel-cuerpo{padding:1rem 1rem 2rem}
+  .tabs{padding:0 .55rem}
+  .tab{padding:.75rem .65rem;font-size:.78rem}
+}
+@media(max-width:420px){
+  .fr .val{font-size:1rem}
+  .fr .et{font-size:.66rem}
+  .fila{padding:.78rem .8rem;gap:.75rem}
+  .fila .der{gap:.4rem}
+  .miembro{gap:.65rem}
+  .acc .btn{font-size:.72rem}
+  .modal{padding:1.2rem}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+</style>
+</head>
+<body>
+
+<div class="entrada" id="vistaLogin" hidden>
+  <div class="card glass">
+    <div class="ico"><span data-i="escudo"></span></div>
+    <h3>Panel del bot</h3>
+    <p>Escribe <b>/panel</b> al bot por WhatsApp y pega aquí el código que te dé.</p>
+    <form id="formLogin" autocomplete="off">
+      <input id="codigo" maxlength="12" placeholder="código" aria-label="Código">
+      <div class="err" id="errLogin" role="alert"></div>
+      <button class="btn p" type="submit"><span data-i="entrar"></span>Entrar</button>
+    </form>
+  </div>
+</div>
+
+<div id="vistaApp" hidden>
+  <header class="topbar glass">
+    <div class="topbar-left">
+      <button class="burger" id="burger" type="button" aria-label="Abrir menú"><span data-i="menu"></span></button>
+      <img src="https://hub-team.xyz/logo-favicon.png" alt="" onerror="this.remove()">
+      <span class="t">Panel Isla</span>
+    </div>
+  </header>
+  <div class="overlay" id="overlay"></div>
+
+  <nav class="side" id="lado" aria-label="Secciones">
+    <div class="marca-card">
+      <span class="av"><img src="https://hub-team.xyz/logo-favicon.png" alt="" onerror="this.remove()"></span>
+      <span><small id="rolPanel">Panel del bot</small><strong>Panel Isla</strong></span>
+    </div>
+    <div class="sec-t">Secciones</div>
+    <ul class="menu">
+      <li><a href="#resumen" data-v="resumen"><span data-i="panel"></span>Resumen</a></li>
+      <li><a href="#grupos" data-v="grupos"><span data-i="grupo"></span>Grupos</a></li>
+      <li><a href="#subbots" data-v="subbots"><span data-i="robot"></span>Sub bots</a></li>
+    </ul>
+    <div class="pie">
+      <button class="salir" id="btnSalir" type="button"><span data-i="salir"></span>Cerrar sesión</button>
+      <span>© Panel Isla</span>
+    </div>
+  </nav>
+
+  <main>
+    <section class="vista" id="v-resumen">
+      <div class="cab"><h2>Estado de <span>Isla</span></h2><p class="cap">Conexión del bot y resumen de todos los grupos</p></div>
+      <div class="franja glass">
+        <div class="fr"><span data-i="servidor"></span><div><span class="et">Estado</span><span class="val" id="stEstado">—</span></div></div>
+        <div class="fr"><span data-i="reloj"></span><div><span class="et">En línea hace</span><span class="val" id="stUp">—</span></div></div>
+        <div class="fr"><span data-i="grupo"></span><div><span class="et">Grupos</span><span class="val" id="stGrupos">—</span></div></div>
+        <div class="fr"><span data-i="usuario"></span><div><span class="et">Miembros</span><span class="val" id="stMiembros">—</span></div></div>
+      </div>
+      <div class="dos">
+        <div class="card glass"><h3>Conexión</h3><dl class="datos" id="datosSocket"></dl></div>
+        <div class="card glass"><h3>Configuración en los grupos</h3><div class="tiles" id="tiles"></div></div>
+      </div>
+    </section>
+
+    <section class="vista" id="v-subbots">
+      <div class="cab"><h2>Sub <span>bots</span></h2><p class="cap">Estado del socket principal y de los sub bots. Toca un sub bot conectado para ver y cambiar sus grupos</p></div>
+      <div class="franja glass">
+        <div class="fr"><span data-i="servidor"></span><div><span class="et">Socket principal</span><span class="val" id="sbEstado">—</span></div></div>
+        <div class="fr"><span data-i="reloj"></span><div><span class="et">Latencia WhatsApp</span><span class="val" id="sbWa">—</span></div></div>
+        <div class="fr"><span data-i="robot"></span><div><span class="et">Sub bots</span><span class="val" id="sbTotal">—</span></div></div>
+        <div class="fr"><span data-i="guardar"></span><div><span class="et">Conectados</span><span class="val" id="sbConectados">—</span></div></div>
+      </div>
+      <div class="dos">
+        <div class="card glass"><h3>Socket principal</h3><dl class="datos" id="datosPrincipal"></dl></div>
+        <div class="card glass"><h3>Sub bots</h3><dl class="datos" id="datosSubs"></dl></div>
+      </div>
+      <div class="herr sep">
+        <button class="btn" id="btnRefrescarSubs" type="button"><span data-i="refrescar"></span>Actualizar</button>
+      </div>
+      <div class="lista" id="listaSubs"></div>
+    </section>
+
+    <section class="vista" id="v-grupos">
+      <div class="cab"><h2 id="tituloGrupos">Grupos de <span>Isla</span></h2><p class="cap" id="capGrupos">Toca un grupo para ver y cambiar su configuración</p></div>
+      <div class="herr" id="barraSub" hidden><a class="btn" href="#subbots"><span data-i="izq"></span>Volver a sub bots</a></div>
+      <div class="card glass sep" id="cardSub" hidden><h3>Grupos de este sub bot</h3><div class="tiles" id="tilesSub"></div></div>
+      <div class="herr" id="herramientas">
+        <input class="buscar" id="q" type="search" placeholder="Buscar por nombre o id…" aria-label="Buscar">
+        <select id="orden" aria-label="Ordenar">
+          <option value="nombre">Nombre</option>
+          <option value="miembros">Miembros</option>
+          <option value="creado">Más recientes</option>
+        </select>
+        <button class="btn" id="btnRefrescar" type="button"><span data-i="refrescar"></span>Actualizar</button>
+      </div>
+      <div class="lista" id="lista"></div>
+      <div class="pager" id="pagerGrupos"></div>
+    </section>
+  </main>
+
+  <div class="velo" id="velo"></div>
+  <div class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitulo">
+    <div class="panel-cab">
+      <div><h3 id="panelTitulo"></h3><p class="jid" id="panelSub"></p></div>
+      <button class="cerrar" id="btnCerrar" type="button" aria-label="Cerrar"><span data-i="x"></span></button>
+    </div>
+    <div class="tabs" id="panelTabs" role="tablist" aria-label="Secciones del grupo"></div>
+    <div class="panel-cuerpo" id="panelCuerpo"></div>
+  </div>
+</div>
+
+<div class="modal-velo" id="modalVelo" hidden>
+  <div class="modal glass" id="modal" role="alertdialog" aria-modal="true" aria-labelledby="modalTitulo" aria-describedby="modalTexto">
+    <h3 id="modalTitulo"></h3>
+    <p id="modalTexto"></p>
+    <form id="modalForm" autocomplete="off">
+      <div id="modalCampos"></div>
+      <div class="modal-botones">
+        <button class="btn" type="button" id="modalCancelar">Cancelar</button>
+        <button class="btn p" type="submit" id="modalOk">Aceptar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const API = window.ISLA_API || '';
+const $ = (id) => document.getElementById(id);
+const enc = encodeURIComponent;
+const h = (tag, cls, hijos) => {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (hijos != null) e.append(...[].concat(hijos));
+  return e;
+};
+
+const ICONOS = {
+  escudo: '<path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
+  menu: '<path d="M4 7h16M4 12h10M4 17h16"/>',
+  panel: '<rect x="4" y="4" width="7" height="9" rx="1"/><rect x="13" y="4" width="7" height="5" rx="1"/><rect x="13" y="11" width="7" height="9" rx="1"/><rect x="4" y="15" width="7" height="5" rx="1"/>',
+  grupo: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.4"/><path d="M17 14.2c2.5 0 4 1.7 4 4.3"/>',
+  salir: '<path d="M9 4H5v16h4"/><path d="M16 8l4 4-4 4"/><path d="M20 12H9"/>',
+  entrar: '<path d="M10 8l4 4-4 4"/><path d="M14 12H3"/><path d="M15 4h5v16h-5"/>',
+  servidor: '<rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/>',
+  reloj: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  usuario: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>',
+  refrescar: '<path d="M20 11a8 8 0 10-2.3 5.7"/><path d="M20 5v6h-6"/>',
+  der: '<path d="M9 6l6 6-6 6"/>',
+  izq: '<path d="M15 6l-6 6 6 6"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  alerta: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>',
+  silencio: '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l4 6M21 9l-4 6"/>',
+  sonido: '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 8c1.5 1.5 1.5 6.5 0 8"/>',
+  expulsar: '<circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6"/><path d="M16 11l5 5M21 11l-5 5"/>',
+  subir: '<path d="M12 19V5M5 12l7-7 7 7"/>',
+  bajar: '<path d="M12 5v14M5 12l7 7 7-7"/>',
+  menos: '<path d="M5 12h14"/>',
+  guardar: '<path d="M5 12l5 5 9-10"/>',
+  robot: '<rect x="5" y="8" width="14" height="11" rx="2"/><path d="M12 4v4M9 13h.01M15 13h.01M9 16.5h6"/><path d="M3 12v3M21 12v3"/>'
+};
+
+function ico(nombre) {
+  const e = document.createElement('span');
+  e.className = 'ic';
+  e.setAttribute('aria-hidden', 'true');
+  e.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICONOS[nombre] || '') + '</svg>';
+  return e;
+}
+document.querySelectorAll('[data-i]').forEach((e) => e.replaceWith(ico(e.dataset.i)));
+
+async function api(ruta, opts = {}) {
+  const r = await fetch(API + ruta, { credentials: 'include', headers: { 'x-panel': '1', 'Content-Type': 'application/json' }, ...opts });
+  let d = null;
+  try { d = await r.json(); } catch {}
+  if (!r.ok) {
+    const e = new Error((d && d.error) || 'Error ' + r.status);
+    e.status = r.status;
+    throw e;
+  }
+  return d;
+}
+
+const baseGrupos = () => (subActual ? '/api/owner/subbots/' + subActual : '/api/panel') + '/grupos';
+const ruta = (jid, resto) => baseGrupos() + '/' + enc(jid) + resto;
+const fecha = (ms) => ms ? new Date(ms).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+const fechaHora = (ms) => ms ? new Date(ms).toLocaleString('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
+const miles = (n) => Number(n || 0).toLocaleString('es');
+const etq = (t, tipo) => h('span', 'etq ' + (tipo || ''), t);
+const dos = (n) => String(n).padStart(2, '0');
+const debounce = (fn, ms) => {
+  let t = 0;
+  return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+};
+function duracion(ms) {
+  if (ms == null) return '—';
+  const m = Math.floor(ms / 60000);
+  if (m < 60) return m + ' min';
+  const hh = Math.floor(m / 60);
+  if (hh < 48) return hh + ' h ' + (m % 60) + ' min';
+  return Math.floor(hh / 24) + ' d ' + (hh % 24) + ' h';
+}
+
+let esOwner = false;
+let subActual = null;
+let ctxCargado = null;
+let iniciado = false;
+let sucio = false;
+let jidAbierto = '';
+let nombreAbierto = '';
+let detalleActual = null;
+let tabActual = 'general';
+let avisoT = 0;
+let peticion = 0;
+let pedidoTab = 0;
+let ultimo = null;
+let paginaGrupos = 1;
+let cargando = false;
+let miembrosEstado = { q: '', pagina: 1 };
+
+function aviso(texto, error) {
+  const t = $('toast');
+  t.textContent = texto;
+  t.className = 'toast on' + (error ? ' err' : '');
+  clearTimeout(avisoT);
+  avisoT = setTimeout(() => t.classList.remove('on'), 4000);
+}
+
+function btn(texto, clase, icono, alClick, etiqueta) {
+  const b = h('button', 'btn ' + (clase || ''), [].concat(icono ? [ico(icono)] : [], texto ? [texto] : []));
+  b.type = 'button';
+  if (etiqueta) {
+    b.setAttribute('aria-label', etiqueta);
+    b.title = etiqueta;
+  }
+  b.addEventListener('click', alClick);
+  return b;
+}
+
+let resolverDialogo = null;
+let focoPrevio = null;
+
+function dialogo({ titulo, texto, campos = [], boton = 'Aceptar', peligro = false }) {
+  return new Promise((resolver) => {
+    $('modalTitulo').textContent = titulo;
+    $('modalTexto').textContent = texto || '';
+    $('modalTexto').hidden = !texto;
+    $('modalCampos').replaceChildren(...campos.map((c) => {
+      const control = c.tipo === 'select' ? h('select') : h('input');
+      if (c.tipo === 'select') {
+        c.opciones.forEach(([v, t]) => {
+          const o = h('option', '', t);
+          o.value = v;
+          control.append(o);
+        });
+      } else {
+        control.type = 'text';
+        control.maxLength = c.max || 120;
+        control.placeholder = c.placeholder || '';
+      }
+      control.dataset.campo = c.id;
+      if (c.valor != null) control.value = c.valor;
+      return h('label', 'campo', [c.etiqueta, control]);
+    }));
+    const ok = $('modalOk');
+    ok.textContent = boton;
+    ok.className = 'btn ' + (peligro ? 'peligro' : 'p');
+    focoPrevio = document.activeElement;
+    resolverDialogo = resolver;
+    $('modalVelo').hidden = false;
+    ($('modalCampos').querySelector('input,select') || $('modalCancelar')).focus();
+  });
+}
+
+function cerrarDialogo(valor) {
+  const r = resolverDialogo;
+  resolverDialogo = null;
+  $('modalVelo').hidden = true;
+  if (focoPrevio && focoPrevio.isConnected) focoPrevio.focus();
+  if (r) r(valor);
+}
+
+const confirmar = (titulo, texto, boton, peligro) => dialogo({ titulo, texto, boton, peligro }).then((v) => !!v);
+
+$('modalForm').addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  const valores = {};
+  document.querySelectorAll('#modalCampos [data-campo]').forEach((e) => { valores[e.dataset.campo] = e.value.trim(); });
+  cerrarDialogo(valores);
+});
+$('modalCancelar').addEventListener('click', () => cerrarDialogo(null));
+$('modalVelo').addEventListener('mousedown', (ev) => { if (ev.target === $('modalVelo')) cerrarDialogo(null); });
+$('modal').addEventListener('keydown', (ev) => {
+  if (ev.key !== 'Tab') return;
+  const f = [...$('modal').querySelectorAll('input,select,button')].filter((x) => !x.disabled && !x.hidden);
+  if (!f.length) return;
+  const primero = f[0];
+  const ultimoF = f[f.length - 1];
+  if (ev.shiftKey && document.activeElement === primero) { ev.preventDefault(); ultimoF.focus(); }
+  else if (!ev.shiftKey && document.activeElement === ultimoF) { ev.preventDefault(); primero.focus(); }
+});
+
+function mostrar(vista) {
+  if (vista !== 'app') { sucio = false; cerrarPanel(); }
+  $('vistaLogin').hidden = vista !== 'login';
+  $('vistaApp').hidden = vista !== 'app';
+}
+
+function cerrarMenu() {
+  $('lado').classList.remove('abierto');
+  $('overlay').classList.remove('abierto');
+}
+
+function pintarContextoGrupos() {
+  $('tituloGrupos').replaceChildren('Grupos de ', h('span', '', subActual ? '+' + subActual : 'Isla'));
+  $('capGrupos').textContent = subActual ? 'Sub bot · toca un grupo para ver y cambiar su configuración' : 'Toca un grupo para ver y cambiar su configuración';
+  $('barraSub').hidden = !subActual;
+  $('cardSub').hidden = !subActual;
+}
+
+function irAVista() {
+  const hash = location.hash;
+  const sub = esOwner ? /^#sub-(\d{8,15})$/.exec(hash) : null;
+  const previo = subActual;
+  subActual = sub ? sub[1] : null;
+  const id = !esOwner || hash === '#grupos' || sub ? 'grupos' : hash === '#subbots' ? 'subbots' : 'resumen';
+  document.querySelectorAll('.vista').forEach((s) => s.classList.toggle('activa', s.id === 'v-' + id));
+  document.querySelectorAll('.menu a').forEach((a) => a.classList.toggle('activo', a.dataset.v === (sub ? 'subbots' : id)));
+  if (previo !== subActual) cerrarPanel();
+  pintarContextoGrupos();
+  cerrarMenu();
+  scrollTo(0, 0);
+  if (id === 'subbots') cargarSubBots(false);
+  if (id === 'grupos' && iniciado && (subActual || 'principal') !== ctxCargado) {
+    paginaGrupos = 1;
+    $('q').value = '';
+    cargarGrupos(false);
+  }
+}
+
+function pintarSocket(s) {
+  const en = $('stEstado');
+  en.textContent = s.conectado ? 'En línea' : 'Sin conexión';
+  en.className = 'val ' + (s.conectado ? 'ok' : 'mal');
+  $('stUp').textContent = s.conectado ? duracion(s.conexion && s.conexion.desdeMs) : '—';
+  $('stGrupos').textContent = s.conectado ? miles(s.grupos.total) : '—';
+  $('stMiembros').textContent = s.conectado ? miles(s.grupos.miembros) : '—';
+  const filas = [['Sesión', s.sesion && s.sesion.secundaria ? 'secundaria' : 'principal']];
+  if (s.conectado) {
+    filas.push(['Bot', (s.usuario && s.usuario.nombre) || '—'], ['Es admin en', miles(s.grupos.botEsAdmin)], ['Comunidades', miles(s.grupos.comunidades)]);
+  }
+  filas.push(['Cerrados por horario', miles(s.gruposCerrados)], ['Bot apagado en', miles(s.gruposApagados)]);
+  $('datosSocket').replaceChildren(...filas.map(([k, v]) => h('div', '', [h('dt', '', k), h('dd', '', String(v))])));
+}
+
+const ESTADOS_SUB = {
+  conectado: ['conectado', 'ok'],
+  'esperando-vinculo': ['esperando vínculo', 'aviso'],
+  conectando: ['conectando', 'aviso'],
+  reconectando: ['reconectando', 'aviso'],
+  iniciando: ['iniciando', 'aviso']
+};
+const ms = (v) => (v == null ? '—' : Math.round(v) + ' ms');
+const mb = (v) => (v == null ? '—' : miles(v) + ' MB');
+
+function filaSubBot(b) {
+  const [texto, tipo] = ESTADOS_SUB[b.estado] || [b.estado, 'mal'];
+  const lineas = [];
+  const base = [];
+  if (b.estado === 'conectado') base.push('activo ' + duracion(b.vivoMin * 60000));
+  base.push(miles(b.mensajes) + ' mensajes');
+  if (b.envioMs != null) base.push('envío ' + ms(b.envioMs));
+  lineas.push(h('div', 'sub', base.join(' · ')));
+  const extra = [];
+  if (b.cola != null) extra.push('cola ' + miles(b.cola));
+  if (b.tope) extra.push('hoy ' + miles(b.hoy) + '/' + miles(b.tope));
+  if (b.deltaMb) extra.push('+' + b.deltaMb + ' MB');
+  if (b.estado === 'esperando-vinculo' && b.venceS != null) extra.push('vence en ' + Math.ceil(b.venceS / 60) + ' min');
+  if (extra.length) lineas.push(h('div', 'sub', extra.join(' · ')));
+  const der = [etq(texto, tipo)];
+  if (b.pausaS > 0) der.push(etq('pausado ' + b.pausaS + ' s', 'aviso'));
+  der.push(h('span', 'punto ' + (tipo === 'ok' ? '' : tipo)));
+  const abrir = b.estado === 'conectado';
+  if (abrir) der.push(ico('der'));
+  const fila = h(abrir ? 'button' : 'div', 'fila glass' + (abrir ? '' : ' fija'), [
+    h('span', 'ini', [ico('robot')]),
+    h('span', '', [h('div', 'nombre', '+' + b.numero)].concat(lineas)),
+    h('span', 'der', der)
+  ]);
+  if (abrir) {
+    fila.type = 'button';
+    fila.addEventListener('click', () => { location.hash = '#sub-' + b.numero; });
+  }
+  return fila;
+}
+
+function pintarSubBots(s, sub) {
+  const en = $('sbEstado');
+  en.textContent = s.conectado ? 'En línea' : 'Sin conexión';
+  en.className = 'val ' + (s.conectado ? 'ok' : 'mal');
+  const m = s.metricas || {};
+  $('sbWa').textContent = s.conectado ? ms(m.latenciaWaMs) : '—';
+  $('sbTotal').textContent = miles(sub.total) + ' / ' + miles(sub.max);
+  $('sbConectados').textContent = miles(sub.conectados);
+
+  const principal = [
+    ['Sesión', s.sesion && s.sesion.secundaria ? 'secundaria' : 'principal'],
+    ['Conectado hace', s.conectado ? duracion(s.conexion && s.conexion.desdeMs) : '—'],
+    ['Socket abierto', !s.conectado ? '—' : s.conexion && s.conexion.socketAbierto === false ? 'no' : 'sí'],
+    ['Latencia WhatsApp', s.conectado ? ms(m.latenciaWaMs) : '—'],
+    ['Latencia base de datos', ms(m.latenciaDbMs)],
+    ['Retraso del hilo (p99)', m.lagMs == null ? '—' : m.lagMs + ' ms'],
+    ['RAM', mb(m.ramMb)],
+    ['Proceso activo hace', m.uptimeS == null ? '—' : duracion(m.uptimeS * 1000)]
+  ];
+  if (s.conectado && s.usuario && s.usuario.nombre) principal.splice(1, 0, ['Bot', s.usuario.nombre]);
+  $('datosPrincipal').replaceChildren(...principal.map(([k, v]) => h('div', '', [h('dt', '', k), h('dd', '', String(v))])));
+
+  const subs = [['Modo', sub.modo === 'remoto' ? 'worker aparte' : 'mismo proceso']];
+  if (sub.worker) {
+    subs.push(['Worker', sub.worker.vivo ? 'en línea' : 'sin respuesta']);
+    if (sub.worker.hace != null) subs.push(['Último reporte', 'hace ' + sub.worker.hace + ' s']);
+  }
+  subs.push(['Vinculados', miles(sub.total) + ' de ' + miles(sub.max)], ['Conectados', miles(sub.conectados)], ['Esperando vínculo', miles(sub.esperando)], ['Reconectando', miles(sub.reconectando)]);
+  $('datosSubs').replaceChildren(...subs.map(([k, v]) => h('div', '', [h('dt', '', k), h('dd', '', String(v))])));
+
+  const alertaWorker = sub.worker && !sub.worker.vivo
+    ? [h('div', 'msg err', 'El worker de sub bots no responde. Lo que ves abajo es el último estado que reportó.')]
+    : [];
+  $('listaSubs').replaceChildren(...alertaWorker, ...(sub.bots.length
+    ? sub.bots.map(filaSubBot)
+    : [h('div', 'vacio glass', [h('h3', '', 'Sin sub bots'), h('p', '', 'Todavía no hay ningún sub bot vinculado.')])]));
+}
+
+let subsCargando = false;
+async function cargarSubBots(manual) {
+  if (subsCargando) return;
+  subsCargando = true;
+  $('btnRefrescarSubs').disabled = true;
+  try {
+    const [s, sub] = await Promise.all([api('/api/owner/socket'), api('/api/owner/subbots')]);
+    pintarSocket(s);
+    pintarSubBots(s, sub);
+    if (manual) aviso('Actualizado');
+  } catch (e) {
+    if (e.status === 401) return sesionCaducada();
+    $('listaSubs').replaceChildren(h('div', 'msg err', e.message));
+  } finally {
+    subsCargando = false;
+    $('btnRefrescarSubs').disabled = false;
+  }
+}
+
+function pintarResumenSub(r) {
+  const items = [['grupos', r.grupos], ['miembros', r.miembros], ['bot admin', r.botAdmin], ['cerrados por horario', r.cerrados], ['bot apagado', r.apagados], ['antilink', r.antilink], ['antispam', r.antispam], ['antiestados', r.antiestados], ['antibots', r.antibots], ['moderación', r.moderacion], ['solo admins', r.soloAdmins], ['bienvenida', r.bienvenida], ['despedida', r.despedida], ['con horario', r.conHorario]];
+  $('tilesSub').replaceChildren(...items.map(([k, v]) => h('div', 'tile', [h('b', '', miles(v)), k])));
+}
+
+function pintarResumen(r) {
+  const items = [['antilink', r.antilink], ['antispam', r.antispam], ['antiestados', r.antiestados], ['antibots', r.antibots], ['moderación', r.moderacion], ['solo admins', r.soloAdmins], ['bienvenida', r.bienvenida], ['despedida', r.despedida], ['con horario', r.conHorario]];
+  $('tiles').replaceChildren(...items.map(([k, v]) => h('div', 'tile', [h('b', '', miles(v)), k])));
+}
+
+function paginador(pagina, paginas, total, plural, alCambiar) {
+  const partes = [];
+  if (paginas > 1) {
+    const ant = btn('', 's i', 'izq', () => alCambiar(pagina - 1), 'Página anterior');
+    ant.disabled = pagina <= 1;
+    partes.push(ant);
+  }
+  partes.push(h('span', '', (paginas > 1 ? 'Página ' + pagina + ' de ' + paginas + ' · ' : '') + miles(total) + ' ' + plural));
+  if (paginas > 1) {
+    const sig = btn('', 's i', 'der', () => alCambiar(pagina + 1), 'Página siguiente');
+    sig.disabled = pagina >= paginas;
+    partes.push(sig);
+  }
+  return partes;
+}
+
+function filaGrupo(g) {
+  const estado = !g.botEsAdmin ? 'aviso' : (g.botApagado || g.cerradoPorHorario ? 'mal' : '');
+  const fila = h('button', 'fila glass', [
+    h('span', 'ini', (g.nombre || '?').trim().charAt(0).toUpperCase() || '?'),
+    h('span', '', [
+      h('div', 'nombre', g.nombre || '(sin nombre)'),
+      h('div', 'sub', miles(g.miembros) + ' miembros · ' + g.admins + ' admins' + (g.comunidad ? ' · comunidad' : ''))
+    ]),
+    h('span', 'der', [
+      g.botApagado ? etq('apagado', 'mal') : g.cerradoPorHorario ? etq('cerrado', 'mal') : g.botEsAdmin ? etq('bot admin', 'ok') : etq('sin admin', 'aviso'),
+      h('span', 'punto ' + estado),
+      ico('der')
+    ])
+  ]);
+  fila.type = 'button';
+  fila.addEventListener('click', () => abrirPanel(g, fila));
+  return fila;
+}
+
+function cerrarPanel() {
+  peticion++;
+  pedidoTab++;
+  $('panel').classList.remove('on');
+  $('velo').classList.remove('on');
+  document.body.classList.remove('bloqueo');
+  document.querySelectorAll('.fila.sel').forEach((b) => b.classList.remove('sel'));
+  if (ultimo && ultimo.isConnected) ultimo.focus();
+  jidAbierto = '';
+  detalleActual = null;
+  if (sucio) { sucio = false; cargarGrupos(false); }
+}
+
+function sesionCaducada() {
+  cerrarPanel();
+  iniciar();
+}
+
+async function bloqueado(fn) {
+  const controles = [...document.querySelectorAll('#panelCuerpo button, #panelCuerpo input, #panelCuerpo select, #panelCuerpo textarea')];
+  const previos = controles.map((x) => x.disabled);
+  controles.forEach((x) => { x.disabled = true; });
+  try {
+    return await fn();
+  } finally {
+    controles.forEach((x, i) => { x.disabled = previos[i]; });
+  }
+}
+
+async function enviar(jid, campo, valor) {
+  return bloqueado(async () => {
+    try {
+      const r = await api(ruta(jid, '/config'), { method: 'POST', body: JSON.stringify({ campo, valor }) });
+      sucio = true;
+      aviso(r.aviso || 'Guardado', !!r.aviso);
+      return r;
+    } catch (e) {
+      if (e.status === 401) { sesionCaducada(); return null; }
+      aviso(e.message, true);
+      return null;
+    }
+  });
+}
+
+async function moderar(accion, cuerpo) {
+  const jid = jidAbierto;
+  return bloqueado(async () => {
+    try {
+      const r = await api(ruta(jid, '/miembros/' + accion), { method: 'POST', body: JSON.stringify(cuerpo) });
+      sucio = true;
+      aviso(r.aviso || r.mensaje || 'Hecho', !!r.aviso);
+      return r;
+    } catch (e) {
+      if (e.status === 401) { sesionCaducada(); return null; }
+      aviso(e.message, true);
+      return null;
+    }
+  });
+}
+
+const TABS = [['general', 'General'], ['miembros', 'Miembros'], ['moderacion', 'Moderación'], ['textos', 'Textos'], ['acceso', 'Acceso']];
+
+function pintarTabs() {
+  const visibles = TABS.filter(([k]) => k !== 'acceso' || (detalleActual && detalleActual.accesoPanel));
+  $('panelTabs').replaceChildren(...visibles.map(([k, t]) => {
+    const b = h('button', 'tab' + (k === tabActual ? ' on' : ''), t);
+    b.type = 'button';
+    b.setAttribute('role', 'tab');
+    b.setAttribute('aria-selected', String(k === tabActual));
+    b.addEventListener('click', () => irATab(k));
+    b.addEventListener('keydown', (ev) => {
+      if (ev.key !== 'ArrowRight' && ev.key !== 'ArrowLeft') return;
+      const todas = [...$('panelTabs').children];
+      const i = todas.indexOf(b) + (ev.key === 'ArrowRight' ? 1 : -1);
+      const sig = todas[(i + todas.length) % todas.length];
+      sig.focus();
+      sig.click();
+    });
+    return b;
+  }));
+}
+
+function irATab(k) {
+  tabActual = k;
+  if (k === 'miembros') miembrosEstado = { q: '', pagina: 1 };
+  pintarTabs();
+  pintarTab();
+  $('panelCuerpo').scrollTop = 0;
+}
+
+function pintarTab() {
+  const d = detalleActual;
+  if (!d) return;
+  pedidoTab++;
+  const cuerpo = $('panelCuerpo');
+  if (tabActual === 'general') cuerpo.replaceChildren(...tabGeneral(d));
+  else if (tabActual === 'textos') cuerpo.replaceChildren(...tabTextos(d));
+  else if (tabActual === 'acceso' && d.accesoPanel) cuerpo.replaceChildren(...tabAcceso(d));
+  else if (tabActual === 'miembros') tabMiembros();
+  else if (tabActual === 'moderacion') {
+    cuerpo.replaceChildren(h('p', 'msg', 'Cargando…'));
+    cargarModeracion();
+  } else {
+    tabActual = 'general';
+    pintarTabs();
+    pintarTab();
+  }
+}
+
+async function abrirPanel(g, boton) {
+  const mio = ++peticion;
+  jidAbierto = g.id;
+  nombreAbierto = g.nombre || '';
+  ultimo = boton;
+  detalleActual = null;
+  tabActual = 'general';
+  document.querySelectorAll('.fila.sel').forEach((b) => b.classList.remove('sel'));
+  boton.classList.add('sel');
+  $('panelTitulo').textContent = g.nombre || '(sin nombre)';
+  $('panelSub').textContent = g.id;
+  $('panelTabs').replaceChildren();
+  $('panelCuerpo').replaceChildren(h('p', 'msg', 'Cargando…'));
+  $('panelCuerpo').scrollTop = 0;
+  $('panel').classList.add('on');
+  $('velo').classList.add('on');
+  document.body.classList.add('bloqueo');
+  $('btnCerrar').focus();
+  try {
+    const d = await api(ruta(g.id, ''));
+    if (mio !== peticion) return;
+    detalleActual = d;
+    pintarTabs();
+    pintarTab();
+  } catch (e) {
+    if (e.status === 401) { sesionCaducada(); return; }
+    if (mio === peticion) $('panelCuerpo').replaceChildren(h('p', 'msg err', e.message));
+  }
+}
+
+async function actualizarDetalle(repintar) {
+  const jid = jidAbierto;
+  if (!jid) return;
+  try {
+    const d = await api(ruta(jid, ''));
+    if (jidAbierto !== jid) return;
+    detalleActual = d;
+    if (!repintar) return;
+    const cuerpo = $('panelCuerpo');
+    const y = cuerpo.scrollTop;
+    pintarTabs();
+    pintarTab();
+    cuerpo.scrollTop = y;
+  } catch (e) {
+    if (e.status === 401) { sesionCaducada(); return; }
+    aviso(e.message, true);
+  }
+}
+
+const bloque = (t, c, nota) => h('section', 'bloque', [h('h4', '', t)].concat(nota ? [h('p', 'jid', nota)] : [], [c]));
+const fijar = (b, valor) => {
+  b.classList.toggle('on', valor);
+  b.setAttribute('aria-checked', String(valor));
+};
+const fila = (nombre, control) => h('div', 'int', [h('span', '', nombre), control]);
+
+const conmutador = (jid, nombre, activo, campo, refrescar, conf) => {
+  const b = h('button', 'sw' + (activo ? ' on' : ''), h('i'));
+  b.type = 'button';
+  b.setAttribute('role', 'switch');
+  b.setAttribute('aria-checked', String(!!activo));
+  b.setAttribute('aria-label', nombre);
+  b.addEventListener('click', async () => {
+    const nuevo = b.getAttribute('aria-checked') !== 'true';
+    if (conf && (conf.cuando === undefined || conf.cuando === nuevo)) {
+      if (!(await confirmar(conf.titulo, conf.texto, conf.boton || 'Continuar', !!conf.peligro))) return;
+    }
+    fijar(b, nuevo);
+    const r = await enviar(jid, campo, nuevo);
+    if (!r) return fijar(b, !nuevo);
+    if (refrescar) actualizarDetalle(true);
+  });
+  return b;
+};
+
+const numero = (jid, nombre, valor, campo, min, max) => {
+  const i = h('input', 'num');
+  i.type = 'number';
+  i.min = min;
+  i.max = max;
+  i.step = 1;
+  i.inputMode = 'numeric';
+  i.value = valor;
+  i.setAttribute('aria-label', nombre);
+  let actual = valor;
+  i.addEventListener('change', async () => {
+    const n = Number(i.value);
+    if (i.value === '' || !Number.isInteger(n) || n < min || n > max) {
+      i.value = actual;
+      return aviso('Debe estar entre ' + min + ' y ' + max + '.', true);
+    }
+    const r = await enviar(jid, campo, n);
+    if (r) actual = n; else i.value = actual;
+  });
+  return fila(nombre, i);
+};
+
+const accionAdvertencia = (jid, valor) => {
+  const s = h('select');
+  [['kick', 'Expulsar'], ['mute', 'Silenciar'], ['notify', 'Solo avisar']].forEach(([v, t]) => {
+    const o = h('option', '', t);
+    o.value = v;
+    s.append(o);
+  });
+  s.value = valor;
+  s.setAttribute('aria-label', 'Acción al llegar al máximo');
+  let actual = s.value;
+  s.addEventListener('change', async () => {
+    const r = await enviar(jid, 'warnAction', s.value);
+    if (r) actual = s.value; else s.value = actual;
+  });
+  return fila('Acción al llegar al máximo', s);
+};
+
+const horario = (jid, nombre, campo, ev) => {
+  const i = h('input', 'hora-in');
+  i.type = 'time';
+  i.value = ev && ev.hora != null ? dos(ev.hora) + ':' + dos(ev.min) : '';
+  i.setAttribute('aria-label', nombre);
+  let actual = i.value;
+  i.addEventListener('change', async () => {
+    const m = /^(\d{2}):(\d{2})$/.exec(i.value);
+    if (!m) { i.value = actual; return; }
+    const r = await enviar(jid, campo, { hora: Number(m[1]), min: Number(m[2]) });
+    if (r) { actual = i.value; actualizarDetalle(true); } else i.value = actual;
+  });
+  return fila(nombre, h('div', 'ctl', [i, conmutador(jid, nombre, !!(ev && ev.habilitado), campo, true)]));
+};
+
+const reglasEditor = (jid, texto) => {
+  const t = h('textarea', 'txt');
+  t.maxLength = 1500;
+  t.rows = 5;
+  t.value = texto || '';
+  t.placeholder = 'Sin reglas definidas';
+  t.setAttribute('aria-label', 'Reglas del grupo');
+  const b = btn('Guardar reglas', '', '', async () => {
+    const r = await enviar(jid, 'reglas', t.value);
+    if (r) actualizarDetalle(true);
+  });
+  return h('div', '', [t, b]);
+};
+
+const nombreEditor = (jid, nombre) => {
+  const i = h('input', 'nom-in');
+  i.type = 'text';
+  i.maxLength = 100;
+  i.value = nombre || '';
+  i.setAttribute('aria-label', 'Nombre del grupo');
+  const guardar = async () => {
+    const r = await enviar(jid, 'nombre', i.value);
+    if (!r) return;
+    i.value = r.valor;
+    nombreAbierto = r.valor;
+    $('panelTitulo').textContent = r.valor;
+    if (detalleActual) detalleActual.nombre = r.valor;
+  };
+  i.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); guardar(); } });
+  return h('div', 'nom-fila', [i, btn('Guardar nombre', '', '', guardar)]);
+};
+
+const editables = (jid, l, refrescar) => h('div', 'caja', l.map(([n, a, campo, conf]) => fila(n, conmutador(jid, n, a, campo, refrescar, conf))));
+const interruptores = (l) => h('div', 'caja', l.map(([n, a, t]) => h('div', 'int' + (a ? ' on' : ''), [h('span', '', n), h('span', '', t || (a ? 'Activo' : 'Apagado'))])));
+const datos = (l) => h('div', 'caja', l.map(([k, v]) => h('div', 'int dato', [h('span', '', k), h('span', '', String(v))])));
+
+function tabGeneral(d) {
+  const c = d.config, p = c.protecciones, m = c.mensajes;
+  const estado = h('div', 'chips');
+  if (d.comunidad) estado.append(etq('comunidad', 'rosa'));
+  estado.append(d.botEsAdmin ? etq('bot admin', 'ok') : etq('bot sin admin', 'aviso'));
+  if (d.botApagado) estado.append(etq('bot apagado', 'mal'));
+  if (d.cerradoPorHorario) estado.append(etq('cerrado por horario', 'mal'));
+
+  const out = [
+    datos([['Miembros', miles(d.miembros)], ['Admins', miles(d.admins.length)], ['Con advertencias', miles(d.moderacion.usuariosConAdvertencias)], ['Silenciados', miles(d.moderacion.silenciadosActivos)]]),
+    h('div', 'bloque', estado),
+    h('p', 'jid', 'Creado ' + fecha(d.creado) + (d.creador ? ' por ' + d.creador : ''))
+  ];
+  out[2].style.marginTop = '.8rem';
+  out.push(bloque('Nombre del grupo', nombreEditor(d.id, d.nombre)));
+  if (esOwner) {
+    out.push(bloque('Bot en este grupo', editables(d.id, [['Bot activo', !d.botApagado, 'botActivo', {
+      cuando: false,
+      titulo: '¿Apagar el bot en este grupo?',
+      texto: 'Dejará de responder comandos y de moderar en «' + (d.nombre || 'este grupo') + '» hasta que lo vuelvas a encender.',
+      boton: 'Apagar',
+      peligro: true
+    }]], true)));
+  }
+  out.push(
+    bloque('Protecciones', editables(d.id, [
+      ['Antilink', p.antilink, 'antilink'],
+      ['Antispam', p.antispam.activo, 'antispam'],
+      ['Antiestados', p.antiestados, 'antiestados'],
+      ['Antibots', p.antibots, 'antibots'],
+      ['Moderación', p.moderacion, 'moderacion'],
+      ['Solo admins', p.soloAdmins, 'soloAdmins', {
+        cuando: true,
+        titulo: '¿Activar «solo admins»?',
+        texto: 'El bot solo atenderá a los admins en este grupo.',
+        boton: 'Activar'
+      }]
+    ])),
+    bloque('Mensajes y avisos', editables(d.id, [
+      ['Bienvenida', m.bienvenida, 'bienvenida'], ['Despedida', m.despedida, 'despedida'], ['Aviso de cierre', m.avisoCierre, 'avisoCierre'],
+      ['Aviso de apertura', m.avisoApertura, 'avisoApertura'], ['Solicitudes', c.solicitudes, 'solicitudes'], ['Alertas', c.alertas, 'alertas']
+    ])),
+    bloque('Antispam', h('div', 'caja', [
+      numero(d.id, 'Límite de mensajes', p.antispam.limite, 'antiSpamLimit', 2, 50),
+      numero(d.id, 'Ventana (segundos)', Math.round(p.antispam.ventanaMs / 1000), 'antiSpamWindow', 2, 60)
+    ])),
+    bloque('Horario', h('div', 'caja', [
+      horario(d.id, 'Cierra', 'cierre', d.horario.cierre),
+      horario(d.id, 'Abre', 'apertura', d.horario.apertura)
+    ])),
+    bloque('Advertencias', h('div', 'caja', [
+      numero(d.id, 'Máximo de advertencias', c.advertencias.maximo, 'maxWarns', 1, 20),
+      accionAdvertencia(d.id, c.advertencias.accion)
+    ])),
+    bloque('Módulos', editables(d.id, c.modulos.map((x) => [((x.emoji || '') + ' ' + x.nombre).trim(), x.activo, 'modulo:' + x.clave])))
+  );
+  if (d.admins.length) out.push(bloque('Admins (' + d.admins.length + ')', h('div', 'chips', d.admins.map((a) => etq(a.jid + (a.superadmin ? ' ★' : ''), a.superadmin ? 'rosa' : '')))));
+  if (d.adminsManualesLista.length) out.push(bloque('Admins manuales', h('div', 'chips', d.adminsManualesLista.map((j) => etq(j)))));
+  if (d.listasManuales.length) out.push(bloque('Listas manuales', datos(d.listasManuales.map((l) => [l.nombre, l.total]))));
+  out.push(bloque('Reglas', reglasEditor(d.id, d.reglas)));
+  out.push(bloque('Ajustes de WhatsApp', interruptores([
+    ['Solo admins escriben', d.soloAdminsEscriben], ['Solo admins editan', d.soloAdminsEditan], ['Aprobación de ingreso', d.aprobacionIngreso],
+    ['Mensajes efímeros', !!d.efimeros, d.efimeros ? Math.round(d.efimeros / 86400) + ' días' : 'Apagado']
+  ])));
+  return out;
+}
+
+const TEXTOS = [
+  ['welcome', 'Bienvenida', 'Se envía cuando alguien entra al grupo. Variables: {mencion} {miembros} {hora} {fecha}.', 'bienvenida'],
+  ['goodbye', 'Despedida', 'Se envía cuando alguien sale del grupo. Variables: {mencion} {miembros} {hora} {fecha}.', 'despedida'],
+  ['cierre', 'Aviso de cierre', 'Se envía cuando el grupo se cierra por horario. Se manda tal cual lo escribas.', 'avisoCierre'],
+  ['apertura', 'Aviso de apertura', 'Se envía cuando el grupo se abre por horario. Se manda tal cual lo escribas.', 'avisoApertura']
+];
+const MAX_TEXTO = 1000;
+
+function editorTexto(d, [tipo, titulo, ayuda, clave]) {
+  const t = d.textos && d.textos[tipo] ? d.textos[tipo] : { mensaje: '', imagenPropia: false };
+  const area = h('textarea', 'txt');
+  area.maxLength = MAX_TEXTO;
+  area.rows = 4;
+  area.value = t.mensaje;
+  area.placeholder = 'Se usa el mensaje por defecto';
+  area.setAttribute('aria-label', titulo);
+  const cuenta = h('span', 'contador', area.value.length + '/' + MAX_TEXTO);
+  area.addEventListener('input', () => { cuenta.textContent = area.value.length + '/' + MAX_TEXTO; });
+
+  const acciones = h('div', 'acciones-fila', [
+    btn('Guardar', 's', 'guardar', async () => {
+      const r = await enviar(d.id, 'texto:' + tipo, area.value);
+      if (r) actualizarDetalle(true);
+    }),
+    cuenta
+  ]);
+
+  const extra = [];
+  if (t.mensaje) {
+    extra.push(btn('Usar el de por defecto', 's', '', async () => {
+      if (!(await confirmar('¿Quitar el texto propio?', 'Se volverá a usar el mensaje por defecto de ' + titulo.toLowerCase() + '.', 'Quitar', true))) return;
+      const r = await enviar(d.id, 'texto:' + tipo, null);
+      if (r) actualizarDetalle(true);
+    }));
+  }
+  if (t.imagenPropia) {
+    extra.push(btn('Quitar imagen propia', 's', '', async () => {
+      if (!(await confirmar('¿Quitar la imagen propia?', 'Se volverá a usar la imagen por defecto de ' + titulo.toLowerCase() + '.', 'Quitar', true))) return;
+      const r = await enviar(d.id, 'imagen:' + tipo, false);
+      if (r) actualizarDetalle(true);
+    }));
+  }
+  const activo = d.config.mensajes[clave];
+  const cab = h('div', 'chips', [activo ? etq('activo', 'ok') : etq('apagado en General', 'aviso')].concat(t.imagenPropia ? [etq('imagen propia', 'rosa')] : []));
+  return bloque(titulo, h('div', '', [cab, h('p', 'jid', ayuda), area, acciones].concat(extra.length ? [h('div', 'chips', extra)] : [])));
+}
+
+function tabTextos(d) {
+  const out = [h('p', '', 'Personaliza los mensajes del grupo. Si lo dejas vacío, el bot usa el de por defecto.')];
+  TEXTOS.forEach((x) => out.push(editorTexto(d, x)));
+  out.push(h('p', 'jid', 'La imagen de cada mensaje se cambia desde WhatsApp con el comando /config.'));
+  return out;
+}
+
+function tabAcceso(d) {
+  const a = d.accesoPanel;
+  const lista = h('div', 'caja' + (a.restringido ? '' : ' apagada'), a.admins.map((x) => {
+    const sw = conmutador(d.id, x.etiqueta, x.permitido, 'panelAdmin:' + x.id, true);
+    if (x.superadmin) sw.disabled = true;
+    return fila(x.etiqueta + (x.superadmin ? ' · creador' : ''), sw);
+  }));
+  return [
+    h('p', '', 'Elige qué admins de este grupo pueden usar el panel. El creador del grupo y el dueño del bot siempre tienen acceso.'),
+    bloque('Quién puede entrar', editables(d.id, [['Solo los admins que elija', a.restringido, 'panelRestringido', {
+      cuando: true,
+      titulo: '¿Limitar el acceso al panel?',
+      texto: 'Solo podrán entrar al panel de este grupo el creador y los admins que marques abajo.',
+      boton: 'Limitar'
+    }]], true)),
+    bloque('Admins del grupo (' + a.admins.length + ')', a.admins.length ? lista : h('p', '', 'Este grupo no tiene admins aparte del bot.'), a.restringido ? '' : 'Ahora mismo todos los admins pueden entrar. Activa la opción de arriba para limitar el acceso.')
+  ];
+}
+
+function tabMiembros() {
+  const q = h('input', 'buscar');
+  q.type = 'search';
+  q.inputMode = 'numeric';
+  q.placeholder = 'Buscar por número…';
+  q.value = miembrosEstado.q;
+  q.setAttribute('aria-label', 'Buscar miembro por número');
+  q.addEventListener('input', debounce(() => {
+    miembrosEstado = { q: q.value.trim(), pagina: 1 };
+    cargarMiembros();
+  }, 300));
+  $('panelCuerpo').replaceChildren(
+    h('div', 'herr', [q]),
+    h('div', 'lista', [h('p', 'msg', 'Cargando…')]),
+    h('div', 'pager')
+  );
+  $('panelCuerpo').children[1].id = 'listaMiembros';
+  $('panelCuerpo').children[2].id = 'pagerMiembros';
+  cargarMiembros();
+}
+
+async function cargarMiembros() {
+  const jid = jidAbierto;
+  const mio = ++pedidoTab;
+  const params = new URLSearchParams({ pagina: String(miembrosEstado.pagina) });
+  if (miembrosEstado.q) params.set('q', miembrosEstado.q);
+  try {
+    const d = await api(ruta(jid, '/miembros?' + params));
+    if (mio !== pedidoTab || jidAbierto !== jid || tabActual !== 'miembros') return;
+    miembrosEstado.pagina = d.pagina;
+    const lista = $('listaMiembros');
+    lista.replaceChildren(...(d.miembros.length ? d.miembros.map((m) => filaMiembro(m, d)) : [h('p', 'msg', miembrosEstado.q ? 'Nadie coincide con ese número.' : 'No hay miembros.')]));
+    $('pagerMiembros').replaceChildren(...paginador(d.pagina, d.paginas, d.total, 'miembros', (n) => { miembrosEstado.pagina = n; cargarMiembros(); }));
+  } catch (e) {
+    if (e.status === 401) { sesionCaducada(); return; }
+    if (mio === pedidoTab && $('listaMiembros')) $('listaMiembros').replaceChildren(h('p', 'msg err', e.message));
+  }
+}
+
+async function accionTrasModerar(r) {
+  if (!r) return;
+  if (tabActual === 'miembros') cargarMiembros();
+  else if (tabActual === 'moderacion') cargarModeracion();
+  actualizarDetalle(false);
+}
+
+function filaMiembro(m, d) {
+  const chips = [];
+  if (m.superadmin) chips.push(etq('creador', 'rosa'));
+  else if (m.admin) chips.push(etq('admin', 'ok'));
+  if (m.yo) chips.push(etq('tú'));
+  if (m.silenciado) chips.push(etq('silenciado', 'mal'));
+  if (m.advertencias) chips.push(etq(m.advertencias + '/' + d.maximoAdvertencias + ' adv.', 'aviso'));
+
+  const a = m.acciones;
+  const botones = [];
+  if (a.advertir) {
+    botones.push(btn('', 's i', 'alerta', async () => {
+      const v = await dialogo({ titulo: 'Advertir a ' + m.etiqueta, texto: 'Se anunciará la advertencia en el grupo.', boton: 'Advertir', campos: [{ id: 'razon', etiqueta: 'Motivo (opcional)', max: 120 }] });
+      if (v) accionTrasModerar(await moderar('warn', { objetivo: m.id, razon: v.razon }));
+    }, 'Advertir'));
+  }
+  if (a.silenciar) {
+    botones.push(btn('', 's i', 'silencio', async () => {
+      const v = await dialogo({
+        titulo: 'Silenciar a ' + m.etiqueta,
+        texto: 'El bot borrará sus mensajes mientras dure el silencio.',
+        boton: 'Silenciar',
+        campos: [
+          { id: 'duracion', etiqueta: 'Duración', tipo: 'select', valor: '1h', opciones: [['15m', '15 minutos'], ['1h', '1 hora'], ['6h', '6 horas'], ['1d', '1 día'], ['7d', '7 días'], ['30d', '30 días'], ['permanente', 'Permanente']] },
+          { id: 'razon', etiqueta: 'Motivo (opcional)', max: 120 }
+        ]
+      });
+      if (v) accionTrasModerar(await moderar('mute', { objetivo: m.id, duracion: v.duracion, razon: v.razon }));
+    }, 'Silenciar'));
+  }
+  if (a.ascender) {
+    botones.push(btn('', 's i', 'subir', async () => {
+      if (!(await confirmar('¿Dar admin a ' + m.etiqueta + '?', 'Tendrá permisos de administrador en el grupo.', 'Dar admin'))) return;
+      accionTrasModerar(await moderar('promote', { objetivo: m.id }));
+    }, 'Dar admin'));
+  }
+  if (a.degradar) {
+    botones.push(btn('', 's i', 'bajar', async () => {
+      if (!(await confirmar('¿Quitar el admin a ' + m.etiqueta + '?', 'Dejará de ser administrador del grupo.', 'Quitar admin', true))) return;
+      accionTrasModerar(await moderar('demote', { objetivo: m.id }));
+    }, 'Quitar admin'));
+  }
+  if (a.expulsar) {
+    botones.push(btn('', 's i', 'expulsar', async () => {
+      if (!(await confirmar('¿Expulsar a ' + m.etiqueta + '?', 'Se le sacará del grupo. Podrá volver a entrar si tiene el enlace.', 'Expulsar', true))) return;
+      accionTrasModerar(await moderar('kick', { objetivo: m.id }));
+    }, 'Expulsar'));
+  }
+
+  return h('div', 'miembro', [
+    h('span', 'ini', m.superadmin || m.admin ? '★' : '·'),
+    h('div', '', [h('div', 'nombre', m.etiqueta), h('div', 'chips', chips)]),
+    h('div', 'acc', botones)
+  ]);
+}
+
+async function cargarModeracion() {
+  const jid = jidAbierto;
+  const mio = ++pedidoTab;
+  try {
+    const d = await api(ruta(jid, '/moderacion'));
+    if (mio !== pedidoTab || jidAbierto !== jid || tabActual !== 'moderacion') return;
+    const cuerpo = $('panelCuerpo');
+    const y = cuerpo.scrollTop;
+    cuerpo.replaceChildren(...tabModeracion(d));
+    cuerpo.scrollTop = y;
+  } catch (e) {
+    if (e.status === 401) { sesionCaducada(); return; }
+    if (mio === pedidoTab) $('panelCuerpo').replaceChildren(h('p', 'msg err', e.message));
+  }
+}
+
+const ETQ_ACCION = { kick: 'expulsión', mute: 'silencio', notify: 'solo aviso a los admins' };
+
+function regAdvertencia(a, d) {
+  const razones = a.razones.filter((r) => r.razon).map((r) => h('small', '', (r.fecha ? fechaHora(r.fecha) + ' · ' : '') + r.razon));
+  const top = h('div', 'top', [
+    h('div', '', [h('div', 'nombre', a.etiqueta), h('div', 'chips', [etq(a.warns + '/' + d.maximo, 'aviso')].concat(a.enGrupo ? [] : [etq('ya no está en el grupo')]))]),
+    h('div', 'acc', [
+      btn('Quitar una', 's', 'menos', async () => accionTrasModerar(await moderar('unwarn', { objetivo: a.id }))),
+      btn('Reiniciar', 's', 'refrescar', async () => {
+        if (!(await confirmar('¿Reiniciar advertencias?', 'Se borrarán todas las advertencias de ' + a.etiqueta + '.', 'Reiniciar', true))) return;
+        accionTrasModerar(await moderar('resetwarns', { objetivo: a.id }));
+      })
+    ])
+  ]);
+  return h('div', 'reg', [top].concat(razones));
+}
+
+function regSilencio(s) {
+  const detalle = [(s.hasta ? 'Hasta ' + fechaHora(s.hasta) : 'Permanente')];
+  if (s.razon) detalle.push(s.razon);
+  if (s.por) detalle.push('por ' + s.por);
+  return h('div', 'reg', [
+    h('div', 'top', [
+      h('div', '', [h('div', 'nombre', s.etiqueta), h('div', 'chips', s.enGrupo ? [] : [etq('ya no está en el grupo')])]),
+      btn('Quitar silencio', 's', 'sonido', async () => accionTrasModerar(await moderar('unmute', { objetivo: s.id })))
+    ]),
+    h('small', '', detalle.join(' · '))
+  ]);
+}
+
+function formUnban() {
+  const i = h('input', 'nom-in');
+  i.type = 'text';
+  i.inputMode = 'tel';
+  i.maxLength = 20;
+  i.placeholder = 'Número con código de país';
+  i.setAttribute('aria-label', 'Número a quitar de la lista negra');
+  const enviarNumero = async () => {
+    const numero = i.value.replace(/\D/g, '');
+    if (numero.length < 7) return aviso('Escribe el número completo con código de país.', true);
+    if (!(await confirmar('¿Quitar de la lista negra?', 'La lista negra es global: +' + numero + ' podrá volver a entrar a cualquier grupo donde esté el bot.', 'Quitar', true))) return;
+    const r = await moderar('unban', { numero });
+    if (r) i.value = '';
+  };
+  i.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); enviarNumero(); } });
+  return h('div', 'form-fila', [i, btn('Quitar', '', '', enviarNumero)]);
+}
+
+function tabModeracion(d) {
+  return [
+    h('p', '', 'Al llegar a ' + d.maximo + ' advertencias: ' + (ETQ_ACCION[d.accion] || d.accion) + '.'),
+    bloque('Advertencias (' + d.advertencias.length + ')', d.advertencias.length ? h('div', '', d.advertencias.map((a) => regAdvertencia(a, d))) : h('p', '', 'Nadie tiene advertencias.')),
+    bloque('Silenciados (' + d.silenciados.length + ')', d.silenciados.length ? h('div', '', d.silenciados.map(regSilencio)) : h('p', '', 'Nadie está silenciado.')),
+    bloque('Lista negra', formUnban(), 'Quita a un número de la lista negra global del bot.')
+  ];
+}
+
+function sinAcceso() {
+  $('herramientas').hidden = true;
+  $('pagerGrupos').replaceChildren();
+  $('lista').replaceChildren(h('div', 'vacio card glass', [
+    h('h3', '', 'No tienes acceso a ningún grupo'),
+    h('p', '', 'Para usar el panel debes ser admin de un grupo donde esté el bot, y el creador del grupo no puede haberte quitado el acceso.')
+  ]));
+}
+
+async function cargarGrupos(refrescar) {
+  if (cargando) return;
+  cargando = true;
+  $('btnRefrescar').disabled = true;
+  const params = new URLSearchParams({ orden: $('orden').value, pagina: String(paginaGrupos) });
+  const q = $('q').value.trim();
+  if (q) params.set('q', q);
+  if (refrescar) params.set('refrescar', '1');
+  const ctx = subActual || 'principal';
+  ctxCargado = ctx;
+  try {
+    const r = await api(baseGrupos() + '?' + params);
+    if (ctx !== (subActual || 'principal')) return;
+    paginaGrupos = r.pagina;
+    if (!q) (subActual ? pintarResumenSub : pintarResumen)(r.resumen);
+    $('lista').replaceChildren(...(r.grupos.length ? r.grupos.map(filaGrupo) : [h('div', 'msg', q ? 'No hay grupos con ese nombre.' : 'Todavía no hay grupos para mostrar.')]));
+    $('pagerGrupos').replaceChildren(...(r.total ? paginador(r.pagina, r.paginas, r.total, 'grupos', (n) => { paginaGrupos = n; cargarGrupos(false); scrollTo(0, 0); }) : []));
+  } catch (e) {
+    if (e.status === 401) { cargando = false; return iniciar(); }
+    $('lista').replaceChildren(h('div', 'msg err', e.message));
+    $('pagerGrupos').replaceChildren();
+  } finally {
+    cargando = false;
+    $('btnRefrescar').disabled = false;
+    if (ctx !== (subActual || 'principal')) {
+      paginaGrupos = 1;
+      cargarGrupos(false);
+    }
+  }
+}
+
+async function iniciar() {
+  try {
+    const acc = await api('/api/panel/acceso');
+    esOwner = !!acc.owner;
+    $('rolPanel').textContent = esOwner ? 'Panel del dueño' : 'Panel de admins';
+    document.querySelector('.menu a[data-v="resumen"]').parentElement.hidden = !esOwner;
+    document.querySelector('.menu a[data-v="subbots"]').parentElement.hidden = !esOwner;
+    if (esOwner) pintarSocket(await api('/api/owner/socket'));
+    $('herramientas').hidden = false;
+    mostrar('app');
+    irAVista();
+    if (acc.puede === false) sinAcceso();
+    else {
+      paginaGrupos = 1;
+      cargarGrupos(false);
+    }
+    iniciado = true;
+  } catch (e) {
+    if (e.status === 401) return mostrar('login');
+    mostrar('app');
+    $('lista').replaceChildren(h('div', 'msg err', e.message));
+  }
+}
+
+$('formLogin').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  $('errLogin').textContent = '';
+  try {
+    await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ codigo: $('codigo').value.trim() }) });
+    $('codigo').value = '';
+    iniciar();
+  } catch (e) {
+    $('errLogin').textContent = e.status === 400 ? 'Ese código no es válido o ya caducó. Pide uno nuevo con /panel.' : e.message;
+  }
+});
+$('btnSalir').addEventListener('click', async () => {
+  try { await api('/api/auth/logout', { method: 'POST' }); } catch {}
+  mostrar('login');
+});
+$('burger').addEventListener('click', () => {
+  $('lado').classList.toggle('abierto');
+  $('overlay').classList.toggle('abierto');
+});
+$('overlay').addEventListener('click', cerrarMenu);
+$('btnCerrar').addEventListener('click', cerrarPanel);
+$('velo').addEventListener('click', cerrarPanel);
+document.addEventListener('keydown', (ev) => {
+  if (ev.key !== 'Escape') return;
+  if (!$('modalVelo').hidden) cerrarDialogo(null);
+  else if ($('panel').classList.contains('on')) cerrarPanel();
+  else cerrarMenu();
+});
+addEventListener('hashchange', irAVista);
+
+$('q').addEventListener('input', debounce(() => { paginaGrupos = 1; cargarGrupos(false); }, 300));
+$('orden').addEventListener('change', () => { paginaGrupos = 1; cargarGrupos(false); });
+$('btnRefrescar').addEventListener('click', () => cargarGrupos(true));
+$('btnRefrescarSubs').addEventListener('click', () => cargarSubBots(true));
+setInterval(() => {
+  if (esOwner && !document.hidden && !$('vistaApp').hidden && $('v-subbots').classList.contains('activa')) cargarSubBots(false);
+}, 15000);
+
+iniciar();
+</script>
+</body>
+</html>
